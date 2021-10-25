@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-// todo 加载用户,包括读文件,数据解析等
+// 加载用户,包括读文件,数据解析等步骤
 func LoadUserList(isGirl bool) []*entity.User {
 	path := "file/dataset.xlsx"
 	sheetName := "boy"
@@ -25,6 +25,7 @@ func LoadUserList(isGirl bool) []*entity.User {
 		user := &entity.User{
 			Id:     fmt.Sprintf("%s_%d", sheetName, index),
 			Number: index,
+			// 下面是个人信息,待补充
 			BasicInfo: entity.BasicInfo{
 				Name:   row["name"],
 				Sex:    0,
@@ -34,12 +35,14 @@ func LoadUserList(isGirl bool) []*entity.User {
 			Attributes:   map[string]string{},
 			Requirements: map[string]entity.Requirement{},
 		}
+		// 解析属性
 		for columnName, parser := range ColumnParser {
 			value, ok := row[columnName]
 			if ok {
 				user.Attributes[columnName] = parser(value)
 			}
 		}
+		// 解析需求
 		for columnName, parser := range RequirementParser {
 			value, ok := row[fmt.Sprintf("r_%s", columnName)]
 			if ok {
@@ -53,46 +56,6 @@ func LoadUserList(isGirl bool) []*entity.User {
 		users = append(users, user)
 	}
 	return users
-}
-
-// todo 拓展点位,数据解析工作
-var ColumnParser = map[string]func(string) string{
-	"age":    doNothing,
-	"height": doNothing,
-	"body":   doNothing,
-}
-
-// todo 拓展点位,要求数据解析工作
-var RequirementParser = map[string]func(string) string{
-	"age":    rangeParser,
-	"height": rangeParser,
-	"body":   listParser,
-}
-
-func doNothing(s string) string {
-	return s
-}
-
-func listParser(s string) string {
-	l := strings.Split(strings.Trim(s, " "), "┋")
-	r, _ := jsoniter.MarshalToString(l)
-	return r
-}
-func rangeParser(s string) string {
-	l := strings.Split(strings.Trim(s, " "), ",")
-	if len(l) != 2 {
-		return "[0,100000]"
-	}
-	min, err := strconv.ParseInt(l[0], 10, 64)
-	if err != nil {
-		min = 0
-	}
-	max, err := strconv.ParseInt(l[1], 10, 64)
-	if err != nil {
-		max = 10000
-	}
-	r, _ := jsoniter.MarshalToString([]int64{min, max})
-	return r
 }
 
 // 加载excel文件
@@ -122,4 +85,46 @@ func SortUserList(users []*entity.User) []*entity.User {
 		return users[i].Number < users[j].Number
 	})
 	return users
+}
+
+// todo 拓展点位,属性 解析工作
+var ColumnParser = map[string]func(string) string{
+	"age":    doNothing, // 保持原字符串
+	"height": doNothing,
+	"body":   doNothing,
+}
+
+// todo 拓展点位,需求 解析工作
+var RequirementParser = map[string]func(string) string{
+	"age":    rangeParser, // 范围解析
+	"height": rangeParser,
+	"body":   listParser, // 数组解析
+}
+
+// 下面主要定义几种常见的解析方法
+func doNothing(s string) string {
+	return s
+}
+
+func listParser(s string) string {
+	l := strings.Split(strings.Trim(s, " "), "┋")
+	r, _ := jsoniter.MarshalToString(l)
+	return r
+}
+
+func rangeParser(s string) string {
+	l := strings.Split(strings.Trim(s, " "), ",")
+	if len(l) != 2 {
+		return "[0,100000]"
+	}
+	min, err := strconv.ParseInt(l[0], 10, 64)
+	if err != nil {
+		min = 0
+	}
+	max, err := strconv.ParseInt(l[1], 10, 64)
+	if err != nil {
+		max = 10000
+	}
+	r, _ := jsoniter.MarshalToString([]int64{min, max})
+	return r
 }

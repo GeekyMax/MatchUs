@@ -28,7 +28,7 @@ var AttributeDefinitionMap = map[string]AttributeDefinition{
 	"body": {
 		WidgetType: WidgetTypeSingle,
 	},
-	// ... 拓展点位
+	// todo ... 拓展点位, 定义属性控件类型
 }
 
 func GetAttributeDefinition(id string) AttributeDefinition {

@@ -11,15 +11,15 @@ func MustToString(i interface{}) string {
 }
 
 func Infof(format string, args ...interface{}) {
-	logrus.Infof(format, args)
+	logrus.Infof(format, args...)
 }
 
 func Errorf(format string, args ...interface{}) {
-	logrus.Errorf(format, args)
+	logrus.Errorf(format, args...)
 }
 
 func Panicf(format string, args ...interface{}) {
-	logrus.Panicf(format, args)
+	logrus.Panicf(format, args...)
 }
 
 func PanicIfError(err error) {

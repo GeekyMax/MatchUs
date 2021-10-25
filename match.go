@@ -15,7 +15,7 @@ func DoMatch(girls []*entity.User, boys []*entity.User) (result [][]string) {
 		if matchedBoy != nil {
 			// 如果有匹配到的男孩,则从列表中删除
 			util.Infof("[%s]match boy[%s]for girl", girl.Id, matchedBoy.Id)
-			boys = DeleteUserFromList(boys, matchedBoy)
+			boys = deleteUserFromList(boys, matchedBoy)
 			result = append(result, []string{girl.Id, matchedBoy.Id})
 		} else {
 			// 没有匹配到,打个日志
@@ -27,7 +27,7 @@ func DoMatch(girls []*entity.User, boys []*entity.User) (result [][]string) {
 	return
 }
 
-func DeleteUserFromList(list []*entity.User, user *entity.User) []*entity.User {
+func deleteUserFromList(list []*entity.User, user *entity.User) []*entity.User {
 	result := make([]*entity.User, 0)
 	for _, e := range list {
 		if e.Id != user.Id {
